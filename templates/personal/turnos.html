@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block titulo %}Turnos{% endblock %}
+{% block contenido %}
+<h1>Turnos del Club</h1>
+<form method="post" action="{% url 'permisos:personal_turnos' %}" class="tarjeta">{% csrf_token %}
+  <h2>{% if editando %}Editar «{{ editando.nombre }}»{% else %}Nuevo turno{% endif %}</h2>
+  {{ form.turno_id }}
+  <label for="{{ form.nombre.id_for_label }}">{{ form.nombre.label }}</label>
+  {{ form.nombre }}{{ form.nombre.errors }}
+  <label>{{ form.dias.label }}</label>
+  {{ form.dias }}{{ form.dias.errors }}
+  <label for="{{ form.descanso.id_for_label }}">{{ form.descanso.label }}</label>
+  {{ form.descanso }}{{ form.descanso.errors }}
+  <p><label style="display:inline-flex;align-items:center;gap:.4rem;font-weight:400">{{ form.activo }} Turno activo</label></p>
+  <p><button>Guardar turno</button></p>
+</form>
+
+<h2>Turnos existentes</h2>
+{% if turnos %}
+<div class="tabla-wrap"><table>
+  <tr><th>Nombre</th><th>Días</th><th>Descanso</th><th>Estado</th><th>Personas</th><th></th></tr>
+  {% for t in turnos %}
+  <tr>
+    <td>{{ t.nombre }}</td><td>{{ t.dias_legibles }}</td><td>{{ t.descanso|default:"—" }}</td>
+    <td>{% if t.activo %}<span class="estado autorizado">Activo</span>{% else %}<span class="estado cancelado">Inactivo</span>{% endif %}</td>
+    <td>{{ t.empleados.count }}</td>
+    <td><a class="boton secundario" href="{% url 'permisos:personal_turno_editar' t.pk %}">Editar</a></td>
+  </tr>
+  {% endfor %}
+</table></div>
+{% else %}<p class="vacio">Aún no hay turnos creados.</p>{% endif %}
+
+{% if empleados_sin_turno %}
+<div class="aviso">
+  <strong>Sin turno asignado:</strong>
+  {% for e in empleados_sin_turno %}{{ e.nombre }}{% if not forloop.last %}, {% endif %}{% endfor %}
+</div>
+{% endif %}
+{% endblock %}

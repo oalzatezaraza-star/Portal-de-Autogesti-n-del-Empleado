@@ -1,0 +1,38 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sesión vencida · Hato Grande</title>
+<style>
+  :root { --verde:#1f5b3a; --verde-claro:#e6f0ea; --texto:#1d2b24; --borde:#cfd9d3; }
+  * { box-sizing:border-box; }
+  body {
+    margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
+    font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; color:var(--texto);
+    background:var(--verde-claro); padding:1.5rem;
+  }
+  .tarjeta {
+    background:#fff; border-radius:18px; padding:2.4rem 2rem; max-width:420px; width:100%;
+    text-align:center; box-shadow:0 12px 40px rgba(20,40,30,.12);
+  }
+  img { width:4.5rem; height:4.5rem; object-fit:contain; margin-bottom:1rem; }
+  h1 { font-size:1.25rem; margin:0 0 .6rem; }
+  p { color:#5f6f66; margin:0 0 1.5rem; }
+  a.boton {
+    display:inline-block; background:var(--verde); color:#fff; text-decoration:none;
+    font-weight:700; padding:.75rem 1.8rem; border-radius:999px;
+  }
+  a.boton:hover { filter:brightness(1.08); }
+</style>
+</head>
+<body>
+  <div class="tarjeta">
+    <img src="{% static 'img/logo_hatogrande.png' %}" alt="">
+    <h1>Esta página se quedó abierta mucho tiempo</h1>
+    <p>Por seguridad, los formularios vencen después de un rato inactivos. No pasó nada malo — solo hace falta recargar la página e intentarlo de nuevo.</p>
+    <a class="boton" href="/">Volver al portal</a>
+  </div>
+</body>
+</html>

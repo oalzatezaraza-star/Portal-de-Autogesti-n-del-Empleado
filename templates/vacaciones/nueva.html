@@ -1,0 +1,37 @@
+{% load static %}
+{% extends "base.html" %}
+{% block titulo %}Pedir vacaciones{% endblock %}
+{% block contenido %}
+<h1>Pedir vacaciones</h1>
+{% include "vacaciones/_saldo.html" %}
+<div class="tarjeta">
+  <p>Tu jefe inmediato: <strong>{{ empleado.jefe.nombre|default:"sin asignar" }}</strong></p>
+  <p>Cuenta solo los días hábiles: no se descuentan domingos ni festivos. Se piden con al menos {{ antelacion }} días de anticipación y cada solicitud debe tener mínimo {{ min_dias }} días hábiles, salvo que uses todo tu saldo.</p>
+</div>
+<form method="post" class="tarjeta">{% csrf_token %}
+  {{ form.non_field_errors }}
+  <label>Elige tus fechas en el calendario</label>
+  <div id="calendario-vacaciones" class="calendario"></div>
+  <p class="ayuda-fechas">
+    Primer día: <strong id="txt-vi">sin elegir</strong> · Último día: <strong id="txt-vf">sin elegir</strong>
+  </p>
+  <div style="display:none">{{ form.fecha_inicio }}{{ form.fecha_fin }}</div>
+  {{ form.fecha_inicio.errors }}{{ form.fecha_fin.errors }}
+  <label for="{{ form.observaciones.id_for_label }}">{{ form.observaciones.label }}</label>
+  {{ form.observaciones }}{{ form.observaciones.errors }}
+  <p><button type="submit" id="btn-enviar-vac" disabled>Enviar a mi jefe</button></p>
+</form>
+<script src="{% static 'js/calendario_vacaciones.js' %}"></script>
+<script>
+  document.getElementById("vi").addEventListener("change", function () {
+    document.getElementById("txt-vi").textContent = this.value ? this.value.split("-").reverse().join("/") : "sin elegir";
+    var vf = document.getElementById("vf").value;
+    document.getElementById("btn-enviar-vac").disabled = !(this.value && vf);
+  });
+  document.getElementById("vf").addEventListener("change", function () {
+    document.getElementById("txt-vf").textContent = this.value ? this.value.split("-").reverse().join("/") : "sin elegir";
+    var vi = document.getElementById("vi").value;
+    document.getElementById("btn-enviar-vac").disabled = !(vi && this.value);
+  });
+</script>
+{% endblock %}

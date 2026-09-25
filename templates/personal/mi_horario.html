@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block titulo %}Mi horario{% endblock %}
+{% block contenido %}
+<h1>Mi horario</h1>
+<div class="tarjeta">
+  {% if empleado.turno %}
+  <p>Estás en el <strong>{{ empleado.turno.nombre }}</strong>.</p>
+  <p>Días que trabajas: <strong>{{ empleado.turno.dias_legibles }}</strong></p>
+  {% if empleado.turno.descanso %}<p>Descanso: <strong>{{ empleado.turno.descanso }}</strong></p>{% endif %}
+  {% else %}
+  <p class="vacio">Todavía no tienes un turno asignado. Habla con la persona encargada de personal.</p>
+  {% endif %}
+  {% if empleado.horario_inicio and empleado.horario_fin %}
+  <p>Jornada: <strong>{{ empleado.horario_inicio|time:"H:i" }} a {{ empleado.horario_fin|time:"H:i" }}</strong></p>
+  {% endif %}
+</div>
+{% if equipo %}
+<h2>Tu equipo</h2>
+<div class="tabla-wrap"><table>
+  <tr><th>Nombre</th><th>Turno</th></tr>
+  {% for e in equipo %}<tr><td>{{ e.nombre }}</td><td>{{ e.turno.nombre|default:"Sin asignar" }}</td></tr>{% endfor %}
+</table></div>
+{% endif %}
+{% endblock %}

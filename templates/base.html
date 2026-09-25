@@ -1,0 +1,159 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}Portal del empleado{% endblock %}</title>
+  <style>
+    :root { --verde:#1f5b3a; --verde-claro:#e6f0ea; --rojo:#b3263e; --texto:#1d2b24; --borde:#cfd9d3; }
+    * { box-sizing:border-box; }
+    body { margin:0; font:16px/1.5 system-ui,sans-serif; color:var(--texto); background:#f6f8f7; }
+    header { background:var(--verde); color:#fff; padding:.85rem 1.1rem; display:flex; flex-wrap:wrap; gap:1rem; align-items:center; }
+    header a { color:#fff; text-decoration:none; }
+    header nav { display:flex; gap:.35rem; flex-wrap:wrap; flex:1; }
+    header nav a { padding:.5rem 1.05rem; border-radius:999px; font-weight:600; font-size:.9rem; transition:background .15s ease; }
+    header nav a:hover { background:rgba(255,255,255,.14); }
+    header nav a.activo { background:#0f2417; box-shadow:inset 0 0 0 1px rgba(255,255,255,.08); }
+    main { max-width:960px; margin:1.5rem auto; padding:0 1rem; }
+    h1 { font-size:1.4rem; margin:.2rem 0 1rem; }
+    table { width:100%; border-collapse:collapse; background:#fff; }
+    th, td { text-align:left; padding:.55rem .7rem; border-bottom:1px solid var(--borde); vertical-align:top; }
+    .tarjeta { background:#fff; border:1px solid var(--borde); border-radius:16px; padding:1.3rem 1.5rem; margin-bottom:1.1rem; box-shadow:0 1px 3px rgba(20,40,30,.06); }
+    .tarjeta h3 { margin:0 0 .9rem; font-size:1.05rem; }
+    .num { color:var(--rojo); font-weight:700; }
+    .estado { display:inline-block; padding:.1rem .6rem; border-radius:99px; font-size:.85rem; background:var(--verde-claro); }
+    .estado.rechazado, .estado.cancelado, .estado.rechazada, .estado.cancelada { background:#f5dde1; color:var(--rojo); }
+    .estado.autorizado, .estado.autorizada { background:var(--verde); color:#fff; }
+    label { display:block; margin:.7rem 0 .2rem; font-weight:600; }
+    input, select, textarea { width:100%; padding:.5rem; border:1px solid var(--borde); border-radius:6px; font:inherit; }
+    button, .boton { background:var(--verde); color:#fff; border:0; border-radius:999px; padding:.7rem 1.5rem; font:inherit; font-weight:700; cursor:pointer; text-decoration:none; display:inline-block; }
+    button:hover, a.boton:hover { filter:brightness(1.08); }
+    button.secundario, a.boton.secundario { background:#fff; color:var(--texto); border:1px solid var(--borde); }
+    button.peligro { background:var(--rojo); }
+    .filas-info { display:flex; flex-direction:column; }
+    .fila-info { display:flex; justify-content:space-between; align-items:flex-start; gap:1.5rem; padding:.6rem 0; border-bottom:1px solid var(--borde); }
+    .fila-info:last-child { border-bottom:0; }
+    .fila-info .etiqueta { color:#5f6f66; flex:0 0 auto; }
+    .fila-info .valor { font-weight:600; text-align:right; }
+    .historial-lista { list-style:none; padding:0; margin:0; }
+    .historial-lista li { display:flex; flex-wrap:wrap; gap:.3rem 1rem; padding:.65rem 0; border-bottom:1px solid var(--borde); font-size:.92rem; }
+    .historial-lista li:last-child { border-bottom:0; }
+    .historial-lista .h-fecha { color:#5f6f66; min-width:9.5rem; }
+    .historial-lista .h-comentario { flex-basis:100%; color:#5f6f66; }
+    .tarjeta-acento { border-left:4px solid var(--verde); }
+    .mensajes { list-style:none; padding:0; }
+    .mensajes li { padding:.6rem .8rem; border-radius:6px; margin-bottom:.5rem; background:var(--verde-claro); }
+    .mensajes li.error { background:#f5dde1; color:var(--rojo); }
+    .errorlist { color:var(--rojo); padding-left:1rem; margin:.2rem 0; }
+    .cifras { display:grid; grid-template-columns:repeat(auto-fit,minmax(9rem,1fr)); gap:.6rem; margin-bottom:1rem; }
+    .cifra { background:#fff; border:1px solid var(--borde); border-radius:8px; padding:.7rem .9rem; }
+    .cifra b { display:block; font-size:1.5rem; }
+    .cifra.grande { background:var(--verde); color:#fff; border-color:var(--verde); }
+    .aviso { background:#fbf1d8; color:#6b4a08; padding:.6rem .8rem; border-radius:6px; margin-bottom:1rem; }
+    .vacio { color:#5f6f66; padding:1rem; }
+    .banner-club { position:relative; height:150px; background:linear-gradient(120deg,#173d29,#1f5b3a); background-size:cover; background-position:center; overflow:hidden; }
+    .banner-club .banner-velo { position:absolute; inset:0; background:linear-gradient(0deg, var(--verde) 0%, rgba(31,91,58,.35) 45%, rgba(31,91,58,.05) 100%); }
+    .banner-club .banner-texto { position:absolute; left:1.5rem; bottom:.9rem; color:#fff; text-shadow:0 1px 4px rgba(0,0,0,.35); }
+    .banner-club .banner-texto strong { display:block; font-size:1.15rem; }
+    .banner-club .banner-texto span { font-size:.85rem; opacity:.9; }
+    @media (max-width:640px) { .banner-club { height:110px; } }
+    .encabezado-lista { display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap; }
+    .encabezado-lista h1 { margin:0; }
+    .campo-check { display:flex; align-items:center; gap:.5rem; margin:.5rem 0; }
+    .campo-check input { width:auto; }
+    .campo-check label { margin:0; font-weight:400; }
+    .marca { display:flex; align-items:center; gap:.6rem; margin-right:auto; }
+    .marca img { width:2.4rem; height:2.4rem; object-fit:contain; }
+    .tabla-wrap { overflow-x:auto; }
+    .calendario { background:#fff; border:1px solid var(--borde); border-radius:8px; padding:.8rem; max-width:360px; }
+    .cal-cab { display:flex; align-items:center; justify-content:space-between; margin-bottom:.5rem; }
+    .cal-nav { background:var(--verde-claro); color:var(--verde); border:0; border-radius:6px; width:2rem; height:2rem; font-size:1.1rem; cursor:pointer; }
+    .cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:.2rem; }
+    .cal-dow { text-align:center; font-size:.78rem; color:#5f6f66; padding:.2rem 0; }
+    .cal-dia { aspect-ratio:1; border:1px solid transparent; background:none; border-radius:6px; cursor:pointer; font:inherit; }
+    .cal-dia:hover:not(:disabled) { background:var(--verde-claro); }
+    .cal-dia.cal-festivo { color:var(--rojo); }
+    .cal-dia.cal-pasado { color:#c3cdc7; cursor:not-allowed; }
+    .cal-dia.cal-hoy { border-color:var(--verde); font-weight:700; }
+    .cal-dia.cal-sel-ini, .cal-dia.cal-sel-fin { background:var(--verde); color:#fff; }
+    .cal-dia.cal-en-rango { background:var(--verde-claro); }
+    .cal-ayuda, .ayuda-fechas { color:#5f6f66; font-size:.85rem; margin:.5rem 0 0; }
+    @media (max-width:640px) { header { flex-direction:column; align-items:flex-start; } header nav { gap:.6rem .9rem; } }
+  </style>
+</head>
+<body>
+<header>
+  <div class="marca"><img src="{% static 'img/logo_hatogrande.png' %}" alt=""><strong>Hato Grande · Portal del empleado</strong></div>
+  {% if user.is_authenticated %}
+  <nav>
+    {% url 'permisos:mis_solicitudes' as u_mis %}
+    {% url 'permisos:nueva' as u_nueva %}
+    {% url 'permisos:vac_mis' as u_vac %}
+    {% url 'permisos:mi_horario' as u_horario %}
+    <a href="{{ u_mis }}" class="{% if request.path == u_mis %}activo{% endif %}">Mis permisos</a>
+    <a href="{{ u_nueva }}" class="{% if request.path == u_nueva %}activo{% endif %}">Nuevo permiso</a>
+    <a href="{{ u_vac }}" class="{% if request.path == u_vac %}activo{% endif %}">Vacaciones</a>
+    <a href="{{ u_horario }}" class="{% if request.path == u_horario %}activo{% endif %}">Mi horario</a>
+    {% if rol_jefe or rol_gh %}{% url 'permisos:bandeja' as u_bandeja %}<a href="{{ u_bandeja }}" class="{% if request.path == u_bandeja %}activo{% endif %}">Por aprobar</a>{% endif %}
+    {% if rol_porteria or rol_gh %}{% url 'permisos:porteria' as u_porteria %}<a href="{{ u_porteria }}" class="{% if request.path == u_porteria %}activo{% endif %}">Portería</a>{% endif %}
+    {% if rol_gh %}{% url 'permisos:reporte' as u_reporte %}<a href="{{ u_reporte }}" class="{% if request.path == u_reporte %}activo{% endif %}">Reportes</a>{% endif %}
+    {% if rol_gh %}{% url 'permisos:vac_saldos' as u_saldos %}<a href="{{ u_saldos }}" class="{% if request.path == u_saldos %}activo{% endif %}">Saldos de vacaciones</a>{% endif %}
+    {% if rol_admin_personal %}{% url 'permisos:personal_lista' as u_emp %}<a href="{{ u_emp }}" class="{% if request.path == u_emp %}activo{% endif %}">Empleados</a>{% endif %}
+    {% if rol_admin_personal %}{% url 'permisos:personal_turnos' as u_turnos %}<a href="{{ u_turnos }}" class="{% if request.path == u_turnos %}activo{% endif %}">Turnos</a>{% endif %}
+  </nav>
+  <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="secundario">Salir</button></form>
+  {% endif %}
+</header>
+{% if user.is_authenticated %}
+<div class="banner-club" id="bannerClub" style="background-image:url('{% static 'img/fondos/1.jpg' %}')">
+  <div class="banner-velo"></div>
+  <div class="banner-texto"><strong>Hola, {{ user.first_name|default:user.username }}</strong><span>Hato Grande Golf &amp; Tennis Country Club</span></div>
+</div>
+{% endif %}
+<main>
+  {% if messages %}<ul class="mensajes">{% for m in messages %}<li class="{{ m.tags }}">{{ m }}</li>{% endfor %}</ul>{% endif %}
+  {% block contenido %}{% endblock %}
+</main>
+{% if user.is_authenticated %}
+<script>
+(function () {
+  "use strict";
+  // Si hay más de una foto en static/img/fondos/ (1.jpg, 2.jpg, ...), elige una
+  // al azar en cada carga de página para que el banner se sienta más vivo.
+  // Si solo hay una, se queda con esa (ya puesta de una vez arriba).
+  var BASE = "{% static 'img/fondos/' %}";
+  var EXTENSIONES = ["jpg", "jpeg", "png", "webp"];
+  var MAX_FOTOS = 6;
+  var encontradas = [];
+  var pendientes = 0;
+
+  function listo() {
+    if (encontradas.length < 2) return;
+    encontradas.sort(function (a, b) { return a.n - b.n; });
+    var elegida = encontradas[Math.floor(Math.random() * encontradas.length)];
+    var banner = document.getElementById("bannerClub");
+    if (banner) banner.style.backgroundImage = "url('" + elegida.url + "')";
+  }
+
+  for (var n = 1; n <= MAX_FOTOS; n++) {
+    (function (num) {
+      var intentos = EXTENSIONES.slice();
+      function probar() {
+        if (!intentos.length) { pendientes--; if (pendientes === 0) listo(); return; }
+        var ext = intentos.shift();
+        var url = BASE + num + "." + ext;
+        var img = new Image();
+        img.onload = function () { encontradas.push({ n: num, url: url }); pendientes--; if (pendientes === 0) listo(); };
+        img.onerror = probar;
+        img.src = url;
+      }
+      pendientes++;
+      probar();
+    })(n);
+  }
+})();
+</script>
+{% endif %}
+</body>
+</html>

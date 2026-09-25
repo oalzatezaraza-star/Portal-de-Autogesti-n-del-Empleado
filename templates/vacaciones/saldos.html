@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block titulo %}Saldos de vacaciones{% endblock %}
+{% block contenido %}
+<h1>Saldos de vacaciones</h1>
+<p><a href="{% url 'permisos:vac_reporte' %}">Ver reporte de vacaciones</a></p>
+<form method="post" class="tarjeta">{% csrf_token %}
+  <h2>Registrar un ajuste</h2>
+  {{ form.non_field_errors }}
+  {% for campo in form %}
+    <label for="{{ campo.id_for_label }}">{{ campo.label }}</label>
+    {{ campo }}{{ campo.errors }}{% if campo.help_text %}<small>{{ campo.help_text }}</small>{% endif %}
+  {% endfor %}
+  <p><button>Registrar ajuste</button></p>
+</form>
+<div class="tabla-wrap"><table>
+  <tr><th>Empleado</th><th>Ingreso</th><th>Causados</th><th>Ajustes</th><th>Autorizados</th><th>En trámite</th><th>Disponibles</th></tr>
+  {% for e, s in filas %}
+  <tr>
+    <td>{{ e.nombre }}</td>
+    <td>{% if e.fecha_ingreso %}{{ e.fecha_ingreso|date:"d/m/Y" }}{% else %}<span class="estado rechazado">Falta</span>{% endif %}</td>
+    <td>{{ s.causados|floatformat:"-2" }}</td><td>{{ s.ajustes|floatformat:"-2" }}</td>
+    <td>{{ s.autorizados|floatformat:"-2" }}</td><td>{{ s.en_tramite|floatformat:"-2" }}</td>
+    <td><strong>{{ s.disponible|floatformat:"-2" }}</strong></td>
+  </tr>
+  {% endfor %}
+</table></div>
+{% endblock %}

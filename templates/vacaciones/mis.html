@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block titulo %}Mis vacaciones{% endblock %}
+{% block contenido %}
+<h1>Mis vacaciones</h1>
+{% include "vacaciones/_saldo.html" %}
+<p><a class="boton" href="{% url 'permisos:vac_nueva' %}">Pedir vacaciones</a></p>
+{% if solicitudes %}
+<div class="tabla-wrap"><table>
+  <tr><th>No.</th><th>Del</th><th>Al</th><th>Días</th><th>Reintegro</th><th>Estado</th></tr>
+  {% for s in solicitudes %}
+  <tr>
+    <td><a class="num" href="{% url 'permisos:vac_detalle' s.pk %}">{{ s.pk }}</a></td>
+    <td>{{ s.fecha_inicio|date:"d/m/Y" }}</td><td>{{ s.fecha_fin|date:"d/m/Y" }}</td>
+    <td>{{ s.dias_habiles }}</td><td>{{ s.fecha_reintegro|date:"d/m/Y" }}</td>
+    <td><span class="estado {{ s.estado }}">{{ s.get_estado_display }}</span></td>
+  </tr>
+  {% endfor %}
+</table></div>
+{% else %}
+<p class="vacio">Aún no has pedido vacaciones. Usa «Pedir vacaciones» para empezar.</p>
+{% endif %}
+{% endblock %}

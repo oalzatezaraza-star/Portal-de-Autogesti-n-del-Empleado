@@ -1,0 +1,28 @@
+{% load static %}
+<!doctype html><html lang="es"><head><meta charset="utf-8">
+<title>Vacaciones No. {{ s.pk }}</title>
+{% include "permisos/_formato_imprimible.html" %}
+</head><body>
+  <div class="cab">
+    <img src="{% static 'img/logo_hatogrande.png' %}" alt="">
+    <div><h1>Hato Grande Golf &amp; Tennis Country Club</h1><span>Formato de vacaciones</span></div>
+    <div class="no"><small>No.</small><b>{{ s.pk }}</b></div>
+  </div>
+  <dl>
+    <dt>Empleado</dt><dd>{{ s.empleado.nombre }} ({{ s.empleado.cedula }})</dd>
+    <dt>Departamento</dt><dd>{{ s.empleado.area }}</dd>
+    <dt>Período</dt><dd>Del {{ s.fecha_inicio|date:"d/m/Y" }} al {{ s.fecha_fin|date:"d/m/Y" }}</dd>
+    <dt>Días hábiles</dt><dd>{{ s.dias_habiles }}</dd>
+    <dt>Reintegro</dt><dd>{{ s.fecha_reintegro|date:"l d/m/Y" }}</dd>
+    <dt>Estado</dt><dd>{{ s.get_estado_display }}</dd>
+  </dl>
+  <div class="firmas">
+    {% for h in historial %}{% if "jefe" in h.accion %}
+    <div class="firma"><small>Firma del jefe del departamento</small><strong>{{ h.usuario.get_full_name|default:h.usuario.username }}</strong><small>{{ h.fecha|date:"d/m/Y H:i" }}</small></div>
+    {% endif %}{% if "gh" in h.accion %}
+    <div class="firma"><small>Firma jefe de personal</small><strong>{{ h.usuario.get_full_name|default:h.usuario.username }}</strong><small>{{ h.fecha|date:"d/m/Y H:i" }}</small></div>
+    {% endif %}{% endfor %}
+  </div>
+  <button class="btn no-imprimir" onclick="window.print()">Imprimir o guardar como PDF</button>
+  <script>window.addEventListener("load", function(){ setTimeout(function(){ window.print(); }, 250); });</script>
+</body></html>

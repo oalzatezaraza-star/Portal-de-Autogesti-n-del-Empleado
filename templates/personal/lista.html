@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block titulo %}Empleados{% endblock %}
+{% block contenido %}
+<div class="encabezado-lista">
+  <h1>Empleados</h1>
+  <a class="boton" href="{% url 'permisos:personal_nuevo' %}">+ Nuevo empleado</a>
+</div>
+<form method="get" class="tarjeta">
+  <label for="q">Buscar por nombre o identificación</label>
+  <input id="q" name="q" value="{{ q }}">
+  <p><button>Buscar</button></p>
+</form>
+<div class="tabla-wrap"><table>
+  <tr><th>Nombre</th><th>Identificación</th><th>Departamento</th><th>Jefe inmediato</th><th>Turno</th><th>Vínculo</th><th></th></tr>
+  {% for e in empleados %}
+  <tr>
+    <td>{{ e.nombre }}</td><td>{{ e.cedula }}</td><td>{{ e.area }}{% if e.seccion %} / {{ e.seccion }}{% endif %}</td>
+    <td>{{ e.jefe.nombre|default:"—" }}</td>
+    <td>{% if e.turno %}{{ e.turno.nombre }}{% else %}<span class="estado rechazado">Sin asignar</span>{% endif %}</td>
+    <td>{% if e.activo %}<span class="estado autorizado">Activo</span>{% else %}<span class="estado cancelado">Inactivo</span>{% endif %}</td>
+    <td><a class="boton secundario" href="{% url 'permisos:personal_editar' e.pk %}">Editar</a></td>
+  </tr>
+  {% empty %}<tr><td colspan="7" class="vacio">No hay empleados que coincidan.</td></tr>{% endfor %}
+</table></div>
+{% endblock %}

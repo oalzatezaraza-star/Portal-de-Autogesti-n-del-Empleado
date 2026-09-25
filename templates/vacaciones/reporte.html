@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block titulo %}Reporte de vacaciones{% endblock %}
+{% block contenido %}
+<h1>Reporte de vacaciones</h1>
+<form method="get" class="tarjeta">
+  <label>Con vacaciones desde <input type="date" name="desde" value="{{ f.desde }}"></label>
+  <label>Hasta <input type="date" name="hasta" value="{{ f.hasta }}"></label>
+  <label>Departamento <input name="area" value="{{ f.area }}"></label>
+  <label>Estado
+    <select name="estado"><option value="">Todos</option>
+      {% for valor, nombre in estados %}<option value="{{ valor }}" {% if f.estado == valor %}selected{% endif %}>{{ nombre }}</option>{% endfor %}
+    </select>
+  </label>
+  <p><button>Filtrar</button>
+     <button name="formato" value="csv" class="secundario">Descargar Excel (CSV)</button></p>
+</form>
+{% if solicitudes %}
+<div class="tabla-wrap"><table>
+  <tr><th>No.</th><th>Empleado</th><th>Departamento</th><th>Del</th><th>Al</th><th>Días</th><th>Estado</th></tr>
+  {% for s in solicitudes %}
+  <tr>
+    <td><a class="num" href="{% url 'permisos:vac_detalle' s.pk %}">{{ s.pk }}</a></td>
+    <td>{{ s.empleado.nombre }}</td><td>{{ s.empleado.area }}</td>
+    <td>{{ s.fecha_inicio|date:"d/m/Y" }}</td><td>{{ s.fecha_fin|date:"d/m/Y" }}</td>
+    <td>{{ s.dias_habiles }}</td><td>{{ s.get_estado_display }}</td>
+  </tr>
+  {% endfor %}
+</table></div>
+{% else %}
+<p class="vacio">Ninguna solicitud coincide con estos filtros.</p>
+{% endif %}
+{% endblock %}

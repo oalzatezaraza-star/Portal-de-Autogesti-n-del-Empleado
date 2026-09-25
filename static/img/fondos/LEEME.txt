@@ -1,0 +1,21 @@
+Fotos reales del Club para el fondo del login
+================================================
+
+Ahora mismo el login usa una escena ilustrada (colores del golf, el atardecer
+y la cancha de tenis) porque todavía no hay fotografías del Club en este
+proyecto. Para que el login use fotos reales que van cambiando solas:
+
+1. Consigue entre 2 y 6 fotos horizontales del Club (cancha, lago, campo,
+   fachada, atardecer...). Ideal 1920x1080 o más, en formato .jpg.
+2. Ponlas en esta misma carpeta (static/img/fondos/) con los nombres:
+       1.jpg   2.jpg   3.jpg   4.jpg   5.jpg   6.jpg
+   (o .jpeg / .png / .webp — no hace falta que sean todas la misma extensión).
+3. No tienes que tocar ningún archivo de código. La próxima vez que alguien
+   abra la pantalla de ingreso, el sistema detecta las fotos que existan y
+   arma el carrusel automáticamente, reemplazando la escena ilustrada.
+4. Si luego corre `collectstatic` para producción, asegúrate de que estos
+   archivos queden incluidos (collectstatic los copia solo si ya están aquí
+   antes de ejecutarlo).
+
+Pesos sugeridos: cada foto por debajo de 500 KB (compresión JPG calidad
+75-80) para que el login cargue rápido en celular.

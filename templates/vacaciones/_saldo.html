@@ -1,0 +1,10 @@
+{% if saldo.sin_fecha_ingreso %}
+<p class="aviso">Falta la fecha de ingreso del empleado. Gestión Humana debe registrarla (en Zeus o en el administrador) para calcular el saldo.</p>
+{% endif %}
+<div class="cifras">
+  <div class="cifra grande"><b>{{ saldo.disponible|floatformat:"-2" }}</b>Disponibles</div>
+  <div class="cifra"><b>{{ saldo.causados|floatformat:"-2" }}</b>Causados</div>
+  <div class="cifra"><b>{{ saldo.autorizados|floatformat:"-2" }}</b>Autorizados</div>
+  <div class="cifra"><b>{{ saldo.en_tramite|floatformat:"-2" }}</b>En trámite</div>
+  <div class="cifra"><b>{{ saldo.ajustes|floatformat:"-2" }}</b>Ajustes</div>
+</div>

@@ -1,0 +1,16 @@
+{% if lista %}
+<div class="tabla-wrap"><table>
+  <tr><th>No.</th><th>Empleado</th><th>Fecha</th><th>Horario</th><th>Tipo</th></tr>
+  {% for s in lista %}
+  <tr>
+    <td><a class="num" href="{% url 'permisos:detalle' s.pk %}">{{ s.pk }}</a></td>
+    <td>{{ s.empleado.nombre }}</td>
+    <td>{{ s.fecha_inicio|date:"d/m/Y" }}</td>
+    <td>{{ s.hora_salida|time:"H:i" }}{% if s.hora_llegada %} a {{ s.hora_llegada|time:"H:i" }}{% endif %}</td>
+    <td>{{ s.tipo }}</td>
+  </tr>
+  {% endfor %}
+</table></div>
+{% else %}
+<p class="vacio">No hay solicitudes esperando tu decisión.</p>
+{% endif %}

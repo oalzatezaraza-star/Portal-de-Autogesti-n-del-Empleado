@@ -1,0 +1,10 @@
+Hola {{ user.first_name|default:user.username }},
+
+Para crear tu contraseña del Portal de Autogestión del Empleado de Hato Grande,
+entra a este enlace (válido por 24 horas):
+
+{{ protocol }}://{{ domain }}{% url 'password_reset_confirm' uidb64=uid token=token %}
+
+Si no pediste este mensaje, puedes ignorarlo: tu contraseña actual sigue igual.
+
+Hato Grande Golf & Tennis Country Club

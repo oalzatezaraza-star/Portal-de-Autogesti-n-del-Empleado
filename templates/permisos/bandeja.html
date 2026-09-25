@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block contenido %}
+<h1>Por aprobar</h1>
+<h2>Permisos de tu equipo</h2>
+{% include "permisos/_tabla_pendientes.html" with lista=del_jefe %}
+{% if es_gh %}
+<h2>Permisos para visto bueno de Gestión Humana</h2>
+{% include "permisos/_tabla_pendientes.html" with lista=de_gh %}
+{% endif %}
+<h2>Vacaciones de tu equipo</h2>
+{% include "permisos/_tabla_vacaciones.html" with lista=vac_jefe %}
+{% if es_gh %}
+<h2>Vacaciones para autorizar y registrar</h2>
+{% include "permisos/_tabla_vacaciones.html" with lista=vac_gh %}
+{% endif %}
+{% endblock %}

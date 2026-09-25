@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block contenido %}
+<h1>Mis permisos</h1>
+<p><a class="boton" href="{% url 'permisos:nueva' %}">Nuevo permiso</a></p>
+{% if solicitudes %}
+<div class="tabla-wrap"><table>
+  <tr><th>No.</th><th>Fecha</th><th>Tipo</th><th>Horario</th><th>Estado</th></tr>
+  {% for s in solicitudes %}
+  <tr>
+    <td><a class="num" href="{% url 'permisos:detalle' s.pk %}">{{ s.pk }}</a></td>
+    <td>{{ s.fecha_inicio|date:"d/m/Y" }}</td>
+    <td>{{ s.tipo }}</td>
+    <td>{{ s.hora_salida|time:"H:i" }}{% if s.hora_llegada %} a {{ s.hora_llegada|time:"H:i" }}{% endif %}</td>
+    <td><span class="estado {{ s.estado }}">{{ s.get_estado_display }}</span></td>
+  </tr>
+  {% endfor %}
+</table></div>
+{% else %}
+<p class="vacio">Aún no has pedido ningún permiso. Usa «Nuevo permiso» para empezar.</p>
+{% endif %}
+{% endblock %}

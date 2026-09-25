@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block titulo %}Vacaciones No. {{ s.pk }}{% endblock %}
+{% block contenido %}
+<h1>Vacaciones <span class="num">No. {{ s.pk }}</span> <span class="estado {{ s.estado }}">{{ s.get_estado_display }}</span></h1>
+
+<div class="tarjeta">
+  <div class="filas-info">
+    <div class="fila-info"><span class="etiqueta">Nombre del empleado</span><span class="valor">{{ s.empleado.nombre }} ({{ s.empleado.cedula }})</span></div>
+    <div class="fila-info"><span class="etiqueta">Departamento / Sección</span><span class="valor">{{ s.empleado.area }}{% if s.empleado.seccion %} / {{ s.empleado.seccion }}{% endif %}</span></div>
+    <div class="fila-info"><span class="etiqueta">Fechas</span><span class="valor">{{ s.fecha_inicio|date:"d/m/Y" }} al {{ s.fecha_fin|date:"d/m/Y" }} · {{ s.dias_habiles }} días hábiles</span></div>
+    <div class="fila-info"><span class="etiqueta">Reintegro</span><span class="valor">{{ s.fecha_reintegro|date:"l d/m/Y" }}</span></div>
+    {% if s.observaciones %}<div class="fila-info"><span class="etiqueta">Observaciones</span><span class="valor">{{ s.observaciones|linebreaksbr }}</span></div>{% endif %}
+  </div>
+  <p><a class="boton secundario" href="{% url 'permisos:vac_imprimir' s.pk %}" target="_blank" rel="noopener">Imprimir / guardar como PDF</a></p>
+</div>
+
+{% if puede_decidir_jefe or puede_decidir_gh %}
+<div class="tarjeta">
+  <h3>Saldo de {{ s.empleado.nombre }} (sin contar esta solicitud)</h3>
+  {% include "vacaciones/_saldo.html" %}
+</div>
+{% endif %}
+
+{% if coincidencias %}
+<div class="aviso">
+  <strong>Ojo con la cobertura:</strong> estas personas del mismo equipo también tienen vacaciones en esas fechas.
+  <ul>{% for c in coincidencias %}
+    <li>{{ c.empleado.nombre }}: {{ c.fecha_inicio|date:"d/m" }} al {{ c.fecha_fin|date:"d/m" }} ({{ c.get_estado_display }})</li>
+  {% endfor %}</ul>
+</div>
+{% endif %}
+
+{% if puede_decidir_jefe or puede_decidir_gh or puede_cancelar %}
+<form method="post" action="{% url 'permisos:vac_accion' s.pk %}" class="tarjeta">{% csrf_token %}
+  <h3>Tu decisión</h3>
+  <label for="comentario">Comentario (obligatorio si rechazas)</label>
+  <textarea id="comentario" name="comentario" rows="2"></textarea>
+  <p>
+    {% if puede_decidir_jefe %}
+      <button name="accion" value="aprobar_jefe">Aprobar</button>
+      <button name="accion" value="rechazar_jefe" class="peligro">Rechazar</button>
+    {% endif %}
+    {% if puede_decidir_gh %}
+      <button name="accion" value="autorizar">Autorizar y registrar</button>
+      <button name="accion" value="rechazar_gh" class="peligro">Rechazar</button>
+    {% endif %}
+    {% if puede_cancelar %}
+      <button name="accion" value="cancelar" class="secundario">Cancelar solicitud</button>
+    {% endif %}
+  </p>
+</form>
+{% endif %}
+
+<div class="tarjeta">
+  <h3>Historial</h3>
+  <ul class="historial-lista">
+    {% for h in historial %}
+    <li>
+      <span class="h-fecha">{{ h.fecha|date:"d/m/Y H:i" }}</span>
+      <span><strong>{{ h.usuario.get_full_name|default:h.usuario.username }}</strong> · {{ h.get_accion_display }}</span>
+      {% if h.comentario %}<span class="h-comentario">{{ h.comentario }}</span>{% endif %}
+    </li>
+    {% empty %}<li class="vacio">Sin movimientos todavía.</li>{% endfor %}
+  </ul>
+</div>
+{% endblock %}

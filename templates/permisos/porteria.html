@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block titulo %}Portería{% endblock %}
+{% block contenido %}
+<h1>Autorizados hoy, {{ hoy|date:"l j \d\e F" }}</h1>
+<form method="get" class="tarjeta">
+  <label for="q">Buscar por nombre o identificación</label>
+  <input id="q" name="q" value="{{ q }}" autofocus style="font-size:1.2rem">
+</form>
+{% for s in lista %}
+<div class="tarjeta tarjeta-acento" style="font-size:1.15rem">
+  <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:1rem; flex-wrap:wrap">
+    <strong>{{ s.empleado.nombre }}</strong>
+    <span style="text-align:right">Sale <strong>{{ s.hora_salida|time:"H:i" }}</strong>{% if s.hora_llegada %}<br>Regresa <strong>{{ s.hora_llegada|time:"H:i" }}</strong>{% endif %}</span>
+  </div>
+  <p style="margin:.3rem 0 0; color:#5f6f66; font-size:.9rem">
+    <span class="num">No. {{ s.pk }}</span> · {{ s.empleado.area }} · {{ s.tipo }} · Identificación {{ s.empleado.cedula }}
+  </p>
+</div>
+{% empty %}
+<p class="vacio">{% if q %}Nadie con «{{ q }}» tiene permiso autorizado hoy.{% else %}No hay permisos autorizados para hoy.{% endif %}</p>
+{% endfor %}
+{% endblock %}

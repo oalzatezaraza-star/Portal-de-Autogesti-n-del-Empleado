@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Entornos virtuales
+.venv/
+venv/
+env/
+
+# Django
+db.sqlite3
+db.sqlite3-journal
+/staticfiles/
+/media/
+
+# Variables de entorno / secretos
+.env
+.env.*
+
+# Editor / SO
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# Datos de ejemplo de Zeus (no debe ir a producción con datos reales de prueba)
+# Descomenta la siguiente línea si zeus_empleados.csv solo debe existir en local:
+# zeus_empleados.csv

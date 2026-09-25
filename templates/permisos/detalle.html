@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block titulo %}Permiso No. {{ s.pk }}{% endblock %}
+{% block contenido %}
+<h1>Permiso <span class="num">No. {{ s.pk }}</span> <span class="estado {{ s.estado }}">{{ s.get_estado_display }}</span></h1>
+
+<div class="tarjeta">
+  <div class="filas-info">
+    <div class="fila-info"><span class="etiqueta">Nombre del empleado</span><span class="valor">{{ s.empleado.nombre }} ({{ s.empleado.cedula }})</span></div>
+    <div class="fila-info"><span class="etiqueta">Departamento / Sección</span><span class="valor">{{ s.empleado.area }}{% if s.empleado.seccion %} / {{ s.empleado.seccion }}{% endif %}</span></div>
+    <div class="fila-info"><span class="etiqueta">Tipo de permiso</span><span class="valor">{{ s.tipo }}</span></div>
+    <div class="fila-info"><span class="etiqueta">Fecha</span><span class="valor">{{ s.fecha_inicio|date:"d/m/Y" }}{% if s.fecha_fin != s.fecha_inicio %} al {{ s.fecha_fin|date:"d/m/Y" }}{% endif %}</span></div>
+    <div class="fila-info"><span class="etiqueta">Razón del permiso</span><span class="valor">{{ s.motivo|linebreaksbr }}</span></div>
+    <div class="fila-info"><span class="etiqueta">Hora de salida</span><span class="valor">{{ s.hora_salida|time:"H:i" }}</span></div>
+    <div class="fila-info"><span class="etiqueta">Hora de llegada</span><span class="valor">{% if s.hora_llegada %}{{ s.hora_llegada|time:"H:i" }}{% else %}No regresa ese día{% endif %}</span></div>
+    <div class="fila-info"><span class="etiqueta">Tiempo descontable</span><span class="valor">{% if s.descontable is None %}Lo define Gestión Humana{% elif s.descontable %}Sí{% else %}No{% endif %}</span></div>
+  </div>
+  {% for a in adjuntos %}<p><a href="{% url 'permisos:soporte' a.pk %}">Ver soporte</a></p>{% endfor %}
+  <p><a class="boton secundario" href="{% url 'permisos:imprimir_permiso' s.pk %}" target="_blank" rel="noopener">Imprimir / guardar como PDF</a></p>
+</div>
+
+{% if puede_decidir_jefe or puede_decidir_gh or puede_cancelar %}
+<form method="post" action="{% url 'permisos:accion' s.pk %}" class="tarjeta">{% csrf_token %}
+  <h3>Tu decisión</h3>
+  {% if puede_decidir_gh %}
+    <label>Tiempo descontable</label>
+    <select name="descontable">
+      <option value="">Elegir…</option>
+      <option value="no" {% if not s.tipo.descontable_por_defecto %}selected{% endif %}>No</option>
+      <option value="si" {% if s.tipo.descontable_por_defecto %}selected{% endif %}>Sí</option>
+    </select>
+  {% endif %}
+  <label for="comentario">Comentario (obligatorio si rechazas)</label>
+  <textarea id="comentario" name="comentario" rows="2"></textarea>
+  <p>
+    {% if puede_decidir_jefe %}
+      <button name="accion" value="aprobar_jefe">Aprobar</button>
+      <button name="accion" value="rechazar_jefe" class="peligro">Rechazar</button>
+    {% endif %}
+    {% if puede_decidir_gh %}
+      <button name="accion" value="visto_bueno">Dar visto bueno</button>
+      <button name="accion" value="rechazar_gh" class="peligro">Rechazar</button>
+    {% endif %}
+    {% if puede_cancelar %}
+      <button name="accion" value="cancelar" class="secundario">Cancelar solicitud</button>
+    {% endif %}
+  </p>
+</form>
+{% endif %}
+
+<div class="tarjeta">
+  <h3>Historial</h3>
+  <ul class="historial-lista">
+    {% for h in historial %}
+    <li>
+      <span class="h-fecha">{{ h.fecha|date:"d/m/Y H:i" }}</span>
+      <span><strong>{{ h.usuario.get_full_name|default:h.usuario.username }}</strong> · {{ h.get_accion_display }}</span>
+      {% if h.comentario %}<span class="h-comentario">{{ h.comentario }}</span>{% endif %}
+    </li>
+    {% empty %}<li class="vacio">Sin movimientos todavía.</li>{% endfor %}
+  </ul>
+</div>
+{% endblock %}

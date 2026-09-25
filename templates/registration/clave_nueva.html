@@ -1,0 +1,21 @@
+{% extends "registration/_marco_clave.html" %}
+{% block titulo %}Crear contraseña{% endblock %}
+{% block contenido %}
+{% if validlink %}
+<h1>Crea tu contraseña</h1>
+<p>Debe tener al menos 10 caracteres y no ser una contraseña común ni parecida a tu usuario.</p>
+<form method="post">{% csrf_token %}
+  <label for="id_new_password1">Nueva contraseña</label>
+  <input type="password" id="id_new_password1" name="new_password1" required>
+  {{ form.new_password1.errors }}
+  <label for="id_new_password2">Confírmala</label>
+  <input type="password" id="id_new_password2" name="new_password2" required>
+  {{ form.new_password2.errors }}
+  <button>Guardar contraseña</button>
+</form>
+{% else %}
+<h1>El enlace ya no es válido</h1>
+<p>Puede que ya lo hayas usado o que haya vencido. Pide uno nuevo.</p>
+<p><a href="{% url 'password_reset' %}">Pedir un enlace nuevo</a></p>
+{% endif %}
+{% endblock %}

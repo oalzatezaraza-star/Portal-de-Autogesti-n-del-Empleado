@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block titulo %}Nuevo empleado{% endblock %}
+{% block contenido %}
+<h1>Nuevo empleado</h1>
+<div class="tarjeta">
+  <p><small>Esto da de alta a la persona directamente en el portal: crea su registro de empleado
+  y, si quieres, su usuario de acceso. El nombre de usuario para entrar será su identificación.</small></p>
+</div>
+<form method="post" class="tarjeta">{% csrf_token %}
+  {{ form.non_field_errors }}
+  {% for campo in form %}
+    {% if campo.name == "rol_gestion_humana" %}
+    <p style="margin-top:1.2rem"><strong>Roles de acceso</strong><br><small>Además de lo que ve cualquier empleado. Puedes marcar varios, o ninguno para un empleado normal.</small></p>
+    {% endif %}
+    {% if campo.field.widget.input_type == "checkbox" %}
+    <div class="campo-check">{{ campo }}<label for="{{ campo.id_for_label }}">{{ campo.label }}</label></div>
+    {{ campo.errors }}
+    {% else %}
+    <label for="{{ campo.id_for_label }}">{{ campo.label }}</label>
+    {{ campo }}{{ campo.errors }}
+    {% if campo.help_text %}<p><small>{{ campo.help_text }}</small></p>{% endif %}
+    {% endif %}
+  {% endfor %}
+  <p><button>Crear empleado</button></p>
+</form>
+{% endblock %}

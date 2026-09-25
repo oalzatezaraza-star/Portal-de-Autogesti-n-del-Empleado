@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block titulo %}Editar {{ empleado.nombre }}{% endblock %}
+{% block contenido %}
+<h1>{{ empleado.nombre }}</h1>
+<div class="tarjeta">
+  <p><small>Identificación {{ empleado.cedula }} · Jefe inmediato: {{ empleado.jefe.nombre|default:"sin asignar" }}</small></p>
+  <p><small>Nombre, identificación y jefe inmediato vienen de Zeus y no se editan aquí.</small></p>
+  {% if not empleado.usuario_id %}
+  <p><small><strong>Este empleado todavía no tiene usuario de acceso al portal</strong>, así que los roles y la contraseña de abajo no aplican hasta que Zeus lo vincule a un usuario (o se le cree desde «Nuevo empleado»).</small></p>
+  {% endif %}
+</div>
+<form method="post" class="tarjeta">{% csrf_token %}
+  {{ form.non_field_errors }}
+  {% for campo in form %}
+    {% if campo.name == "rol_gestion_humana" %}
+    <p style="margin-top:1.2rem"><strong>Roles de acceso</strong><br><small>Además de lo que ve cualquier empleado. Puedes marcar varios.</small></p>
+    {% endif %}
+    {% if campo.field.widget.input_type == "checkbox" %}
+    <div class="campo-check">{{ campo }}<label for="{{ campo.id_for_label }}">{{ campo.label }}</label></div>
+    {{ campo.errors }}
+    {% else %}
+    <label for="{{ campo.id_for_label }}">{{ campo.label }}</label>
+    {{ campo }}{{ campo.errors }}
+    {% if campo.help_text %}<p><small>{{ campo.help_text }}</small></p>{% endif %}
+    {% endif %}
+  {% endfor %}
+  <p><button>Guardar cambios</button></p>
+</form>
+<h2>Últimos cambios</h2>
+{% if cambios %}
+<div class="tabla-wrap"><table>
+  <tr><th>Fecha</th><th>Quién</th><th>Campo</th><th>De</th><th>A</th></tr>
+  {% for c in cambios %}
+  <tr><td>{{ c.fecha|date:"d/m/Y H:i" }}</td><td>{{ c.usuario.get_full_name|default:c.usuario.username }}</td>
+      <td>{{ c.campo }}</td><td>{{ c.valor_anterior|default:"—" }}</td><td>{{ c.valor_nuevo|default:"—" }}</td></tr>
+  {% endfor %}
+</table></div>
+{% else %}<p class="vacio">Aún no se ha editado manualmente.</p>{% endif %}
+{% endblock %}

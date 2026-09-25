@@ -1,0 +1,241 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hato Grande · Acceso al sistema</title>
+<style>
+  :root {
+    --panel-w:clamp(360px,42vw,620px);
+    --panel-margin-tb:2.6vh;
+    --panel-margin-r:clamp(50px,9vw,150px);
+    --verde-brillo:#2f8a56; --verde:#1E5A3C; --verde-2:#164430;
+    --rojo:#E4536A; --linea:rgba(255,255,255,.22);
+    --texto-claro:#F3F7F4; --texto-gris:#B8C7BF;
+  }
+  * { box-sizing:border-box; }
+  html,body { height:100%; margin:0; }
+  body {
+    font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; color:var(--texto-claro);
+    position:relative; overflow-x:hidden;
+  }
+
+  /* =========================================================================
+     FONDO — foto real si existe en static/img/fondos/1.jpg, 2.jpg, 3.jpg… (se
+     detecta sola, ver script al final) y si no, una escena ilustrada del
+     Club como reserva. No hace falta tocar nada para pasar de una a otra:
+     basta con subir las fotos con esos nombres.
+     ========================================================================= */
+  .fondo { position:fixed; inset:0; z-index:0; background:#12241a; }
+  .fondo-fotos, .fondo-ilustrado { position:absolute; inset:0; }
+  .fondo-fotos { opacity:0; transition:opacity .6s ease; }
+  .fondo-fotos.activo { opacity:1; }
+  .fondo-fotos.activo ~ .fondo-ilustrado { opacity:0; }
+  .foto {
+    position:absolute; inset:0; opacity:0; background-size:cover; background-position:center;
+  }
+  .foto.activo { opacity:1; }
+
+  .escena {
+    position:absolute; inset:0; opacity:1; background-size:cover; background-position:center;
+    background-image:
+      radial-gradient(ellipse 70% 55% at 28% 34%, rgba(255,214,150,.30), transparent 62%),
+      radial-gradient(ellipse 60% 50% at 75% 15%, rgba(210,150,160,.18), transparent 60%),
+      linear-gradient(180deg, #2c3456 0%, #8a7d72 24%, #f2c896 40%, #4c6a3c 58%, #17351f 100%);
+  }
+  .velo { position:fixed; inset:0; z-index:1;
+    background:linear-gradient(0deg, rgba(4,12,8,.35), rgba(4,12,8,0) 30%);
+  }
+
+  /* =========================================================================
+     PANEL — tarjeta flotante, redondeada, casi a todo el alto pero con
+     margen arriba/abajo/derecha (se ve la foto alrededor), tal como la
+     referencia del Club.
+     ========================================================================= */
+  .panel {
+    position:fixed; top:var(--panel-margin-tb); bottom:var(--panel-margin-tb);
+    right:var(--panel-margin-r); z-index:2; width:var(--panel-w);
+    border-radius:22px;
+    background:linear-gradient(165deg, rgba(14,24,20,.34), rgba(8,16,13,.42));
+    border:1px solid rgba(255,255,255,.14);
+    backdrop-filter:blur(6px) saturate(1.15);
+    display:flex; flex-direction:column; justify-content:center;
+    padding:2.4rem clamp(1.6rem,4vw,2.8rem);
+    box-shadow:0 25px 70px rgba(0,0,0,.45);
+  }
+  .panel h1 { margin:0; font-size:1.55rem; font-weight:800; color:#fff; }
+  .panel .subt { margin:.3rem 0 1.4rem; color:var(--texto-gris); font-size:.94rem; }
+
+  form { margin:0; }
+  .campo { position:relative; margin-bottom:.9rem; }
+  .campo svg { position:absolute; left:.85rem; top:50%; transform:translateY(-50%); width:18px; height:18px; opacity:.75; pointer-events:none; }
+  .campo label { position:absolute; left:-9999px; }
+  .campo input {
+    width:100%; padding:.8rem .8rem .8rem 2.6rem; border-radius:10px; font:inherit;
+    background:rgba(255,255,255,.08); border:1px solid var(--linea); color:#fff;
+  }
+  .campo input::placeholder { color:var(--texto-gris); }
+  .campo input:focus { outline:2px solid var(--verde-brillo); outline-offset:1px; background:rgba(255,255,255,.12); }
+
+  button.ingresar {
+    width:100%; margin-top:.4rem; padding:.85rem; border:0; border-radius:10px; font:inherit;
+    font-weight:800; letter-spacing:.06em; text-transform:uppercase; font-size:.92rem;
+    background:linear-gradient(180deg,var(--verde-brillo),var(--verde)); color:#fff; cursor:pointer;
+    box-shadow:0 8px 20px rgba(30,90,60,.45);
+  }
+  button.ingresar:hover { background:linear-gradient(180deg,#38955f,var(--verde-2)); }
+  button.ingresar:active { transform:translateY(1px); }
+
+  .errores, .bloqueo {
+    display:flex; gap:.5rem; align-items:flex-start; color:var(--rojo);
+    font-size:.86rem; margin:.85rem 0 0; text-align:center; justify-content:center;
+  }
+  .bloqueo { color:#ffc2cd; background:rgba(228,83,106,.15); border:1px solid rgba(228,83,106,.4); border-radius:9px; padding:.6rem .75rem; text-align:left; }
+  .errores svg, .bloqueo svg { flex:0 0 auto; width:16px; height:16px; margin-top:.1rem; }
+
+  .olvide { display:block; text-align:center; margin-top:1.1rem; font-size:.85rem; color:var(--texto-gris); text-decoration:none; }
+  .olvide:hover { color:#fff; text-decoration:underline; }
+
+  .ayuda-usuario { margin:-.55rem 0 .95rem; font-size:.78rem; color:var(--texto-gris); }
+
+  .roles { display:none; }
+  .pie {
+    margin-top:1.6rem; padding-top:1rem; border-top:1px solid rgba(255,255,255,.12);
+    text-align:center; color:rgba(255,255,255,.6); font-size:.76rem;
+  }
+
+  /* =========================================================================
+     LOGO — grande, a la izquierda de la tarjeta, superpuesto a su borde,
+     igual que en la foto de referencia del Club.
+     ========================================================================= */
+  .marca-grande {
+    position:fixed; z-index:3; top:50%; transform:translateY(-50%);
+    left:clamp(60px,16vw,280px); text-align:center;
+  }
+  .marca-grande img {
+    width:clamp(230px,28vw,380px); height:clamp(230px,28vw,380px); object-fit:contain;
+    filter:drop-shadow(0 10px 24px rgba(0,0,0,.5));
+  }
+
+  /* =========================================================================
+     MÓVIL — el panel de todo el alto no cabe: pasa a tarjeta centrada.
+     ========================================================================= */
+  @media (max-width:820px) {
+    body { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:1.5rem 1rem 1rem; }
+    .panel {
+      position:relative; inset:auto; width:min(92vw,400px); border-radius:18px;
+      border:1px solid rgba(255,255,255,.14); box-shadow:0 25px 70px rgba(0,0,0,.5);
+      margin-top:6.5rem;
+    }
+    .marca-grande { position:absolute; top:1.2rem; left:50%; transform:translateX(-50%); }
+    .marca-grande img { width:132px; height:132px; }
+  }
+  @media (max-height:640px) and (max-width:820px) {
+    .marca-grande img { width:92px; height:92px; }
+    .panel { margin-top:5rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="fondo" aria-hidden="true">
+  <div class="fondo-fotos" id="fondoFotos"></div>
+  <div class="fondo-ilustrado">
+    <div class="escena"></div>
+  </div>
+</div>
+<div class="velo" aria-hidden="true"></div>
+
+<div class="marca-grande">
+  <img src="{% static 'img/logo_hatogrande.png' %}" alt="Hato Grande Golf &amp; Tennis Country Club">
+</div>
+
+<div class="panel">
+  <div class="roles" role="group" aria-label="Ingresar como">
+    {% for clave, nombre in roles_login %}
+    <a href="?rol={{ clave }}" class="{% if rol_elegido == clave %}activo{% endif %}">{{ nombre }}</a>
+    {% endfor %}
+  </div>
+
+  <h1>Acceso al Sistema</h1>
+  <p class="subt">Ingrese sus credenciales</p>
+
+  {% if bloqueo_minutos %}
+  <p class="bloqueo">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+    <span>Se bloqueó temporalmente este usuario por varios intentos fallidos. Espera {{ bloqueo_minutos }} minutos e inténtalo de nuevo, o recupera tu contraseña abajo.</span>
+  </p>
+  {% endif %}
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+    <input type="hidden" name="rol" value="{{ rol_elegido }}">
+    <div class="campo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-4 5-6 8-6s6.5 2 8 6"/></svg>
+      <label for="id_username">Usuario</label>
+      <input type="text" id="id_username" name="username" placeholder="Usuario" autocomplete="username" autofocus required>
+    </div>
+    <div class="campo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+      <label for="id_password">Contraseña</label>
+      <input type="password" id="id_password" name="password" placeholder="Contraseña" autocomplete="current-password" required>
+    </div>
+    <button type="submit" class="ingresar">Ingresar</button>
+
+    {% if not bloqueo_minutos and form.errors %}
+    <p class="errores">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+      <span>Usuario o contraseña incorrectos</span>
+    </p>
+    {% endif %}
+  </form>
+
+  <a class="olvide" href="{% url 'password_reset' %}">¿Olvidaste tu contraseña o es tu primer ingreso?</a>
+
+  <p class="pie">&copy; {% now "Y" %} Hato Grande Golf &amp; Tennis Country Club</p>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  // Busca fotos reales en static/img/fondos/1.jpg ... 6.jpg (o .png/.webp).
+  // Si no existe ninguna, se queda la escena ilustrada de arriba.
+  var BASE = "{% static 'img/fondos/' %}";
+  var EXTENSIONES = ["jpg", "jpeg", "png", "webp"];
+  var MAX_FOTOS = 6;
+  var encontradas = [];
+  var pendientes = 0;
+
+  function listo() {
+    if (!encontradas.length) return;
+    encontradas.sort(function (a, b) { return a.n - b.n; });
+    var cont = document.getElementById("fondoFotos");
+    // Solo la primera foto encontrada, fija: sin ciclo ni desvanecido.
+    var d = document.createElement("div");
+    d.className = "foto activo";
+    d.style.backgroundImage = "url('" + encontradas[0].url + "')";
+    cont.appendChild(d);
+    cont.classList.add("activo");
+  }
+
+  for (var n = 1; n <= MAX_FOTOS; n++) {
+    (function (num) {
+      var intentos = EXTENSIONES.slice();
+      function probar() {
+        if (!intentos.length) { pendientes--; if (pendientes === 0) listo(); return; }
+        var ext = intentos.shift();
+        var url = BASE + num + "." + ext;
+        var img = new Image();
+        img.onload = function () { encontradas.push({ n: num, url: url }); pendientes--; if (pendientes === 0) listo(); };
+        img.onerror = probar;
+        img.src = url;
+      }
+      pendientes++;
+      probar();
+    })(n);
+  }
+})();
+</script>
+</body>
+</html>

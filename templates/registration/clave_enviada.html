@@ -1,0 +1,7 @@
+{% extends "registration/_marco_clave.html" %}
+{% block titulo %}Enlace enviado{% endblock %}
+{% block contenido %}
+<h1>Revisa tu correo</h1>
+<p>Si el correo está registrado, te llegará un mensaje con un enlace para crear tu contraseña. El enlace es válido por 24 horas.</p>
+<p><a href="{% url 'login' %}">Volver a ingresar</a></p>
+{% endblock %}

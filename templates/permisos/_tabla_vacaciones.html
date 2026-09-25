@@ -1,0 +1,15 @@
+{% if lista %}
+<div class="tabla-wrap"><table>
+  <tr><th>No.</th><th>Empleado</th><th>Del</th><th>Al</th><th>Días hábiles</th></tr>
+  {% for s in lista %}
+  <tr>
+    <td><a class="num" href="{% url 'permisos:vac_detalle' s.pk %}">{{ s.pk }}</a></td>
+    <td>{{ s.empleado.nombre }}</td>
+    <td>{{ s.fecha_inicio|date:"d/m/Y" }}</td><td>{{ s.fecha_fin|date:"d/m/Y" }}</td>
+    <td>{{ s.dias_habiles }}</td>
+  </tr>
+  {% endfor %}
+</table></div>
+{% else %}
+<p class="vacio">No hay vacaciones esperando tu decisión.</p>
+{% endif %}

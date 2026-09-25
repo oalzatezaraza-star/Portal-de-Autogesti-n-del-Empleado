@@ -1,0 +1,31 @@
+{% load static %}
+<!doctype html><html lang="es"><head><meta charset="utf-8">
+<title>Permiso No. {{ s.pk }}</title>
+{% include "permisos/_formato_imprimible.html" %}
+</head><body>
+  <div class="cab">
+    <img src="{% static 'img/logo_hatogrande.png' %}" alt="">
+    <div><h1>Hato Grande Golf &amp; Tennis Country Club</h1><span>Formato de permisos</span></div>
+    <div class="no"><small>No.</small><b>{{ s.pk }}</b></div>
+  </div>
+  <dl>
+    <dt>Empleado</dt><dd>{{ s.empleado.nombre }} ({{ s.empleado.cedula }})</dd>
+    <dt>Departamento / Sección</dt><dd>{{ s.empleado.area }}{% if s.empleado.seccion %} / {{ s.empleado.seccion }}{% endif %}</dd>
+    <dt>Tipo de permiso</dt><dd>{{ s.tipo }}</dd>
+    <dt>Fecha</dt><dd>{{ s.fecha_inicio|date:"d/m/Y" }}{% if s.fecha_fin != s.fecha_inicio %} al {{ s.fecha_fin|date:"d/m/Y" }}{% endif %}</dd>
+    <dt>Horario</dt><dd>Salida {{ s.hora_salida|time:"H:i" }}{% if s.hora_llegada %} · Llegada {{ s.hora_llegada|time:"H:i" }}{% endif %}</dd>
+    <dt>Razón</dt><dd>{{ s.motivo }}</dd>
+    <dt>Tiempo descontable</dt><dd>{% if s.descontable is None %}Pendiente{% elif s.descontable %}Sí{% else %}No{% endif %}</dd>
+    <dt>Estado</dt><dd>{{ s.get_estado_display }}</dd>
+  </dl>
+  <div class="firmas">
+    {% for h in historial %}{% if "jefe" in h.accion %}
+    <div class="firma"><small>Firma del jefe del departamento</small><strong>{{ h.usuario.get_full_name|default:h.usuario.username }}</strong><small>{{ h.fecha|date:"d/m/Y H:i" }}</small></div>
+    {% endif %}{% if "gh" in h.accion %}
+    <div class="firma"><small>Firma jefe de personal</small><strong>{{ h.usuario.get_full_name|default:h.usuario.username }}</strong><small>{{ h.fecha|date:"d/m/Y H:i" }}</small></div>
+    {% endif %}{% endfor %}
+    <div class="firma"><small>Portería</small><strong>{% if s.estado == "autorizado" %}Autorizado{% else %}—{% endif %}</strong></div>
+  </div>
+  <button class="btn no-imprimir" onclick="window.print()">Imprimir o guardar como PDF</button>
+  <script>window.addEventListener("load", function(){ setTimeout(function(){ window.print(); }, 250); });</script>
+</body></html>

@@ -1,0 +1,4 @@
+cedula,nombre,cargo,area,seccion,email,jefe_cedula,activo,horario_inicio,horario_fin,fecha_ingreso
+1001,Marta Rojas,Jefe de Golf,Golf,Campo,marta@club.test,,1,07:00,16:00,2016-03-01
+1002,Camilo Pardo,Jardinero,Golf,Campo,camilo@club.test,1001,1,06:00,15:00,2022-08-16
+1003,Diana Suárez,Auxiliar,Golf,Caddie master,diana@club.test,1001,1,07:00,16:00,2024-02-05

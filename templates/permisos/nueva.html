@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block contenido %}
+<h1>Nuevo permiso</h1>
+<div class="tarjeta">
+  <p><strong>{{ empleado.nombre }}</strong><br>{{ empleado.area }}{% if empleado.seccion %} / {{ empleado.seccion }}{% endif %}</p>
+  <p>Tu jefe inmediato: <strong>{{ empleado.jefe.nombre|default:"sin asignar" }}</strong></p>
+</div>
+<form method="post" enctype="multipart/form-data" class="tarjeta">{% csrf_token %}
+  {{ form.non_field_errors }}
+  {% for campo in form %}
+    <label for="{{ campo.id_for_label }}">{{ campo.label }}</label>
+    {{ campo }}{{ campo.errors }}
+  {% endfor %}
+  <p><button>Enviar a mi jefe</button></p>
+</form>
+{% endblock %}
