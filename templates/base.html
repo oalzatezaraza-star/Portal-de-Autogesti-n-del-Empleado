@@ -71,7 +71,7 @@
     .cal-nav { background:var(--verde-claro); color:var(--verde); border:0; border-radius:6px; width:2rem; height:2rem; font-size:1.1rem; cursor:pointer; }
     .cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:.2rem; }
     .cal-dow { text-align:center; font-size:.78rem; color:#5f6f66; padding:.2rem 0; }
-    .cal-dia { aspect-ratio:1; border:1px solid transparent; background:none; border-radius:6px; cursor:pointer; font:inherit; }
+    .cal-dia { aspect-ratio:1; width:100%; padding:0; margin:0; border:1px solid transparent; background:none; border-radius:6px; cursor:pointer; font:inherit; color:var(--texto); display:block; }
     .cal-dia:hover:not(:disabled) { background:var(--verde-claro); }
     .cal-dia.cal-festivo { color:var(--rojo); }
     .cal-dia.cal-pasado { color:#c3cdc7; cursor:not-allowed; }
